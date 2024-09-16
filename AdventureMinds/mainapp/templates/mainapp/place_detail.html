@@ -1,0 +1,21 @@
+<!-- place_detail.html -->
+{% extends "mainapp/add_review.html" %}
+
+{% block content %}
+ <h2>{{ place.name }}</h2>
+ <p>{{ place.address }}</p>
+
+ <h3>Reviews</h3>
+ {% for review in object.review_set.all %}
+ <p>{{ review.text }} - {{ review.user.username }}</p>
+ {% empty %}
+ <p>No reviews yet.</p>
+ {% endfor %}
+
+ <h3>Ratings</h3>
+ {% for rating in object.rating_set.all %}
+ <p>{{ rating.value }} - {{ rating.user.username }}</p>
+ {% empty %}
+ <p>No ratings yet.</p>
+ {% endfor %}
+{% endblock %}

@@ -1,0 +1,296 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ trip.title }} Details
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            {{ trip.title }}
+        </div>
+        <div class="card-body">
+            <div class="user-info">
+                <div>
+                    <img src="{{ trip.uploader.userprofile.profile_photo.url }}" alt="{{ trip.uploader.username }}">
+                    <span>{{ trip.uploader.username }}</span>
+                </div>
+                {% if request.user.is_authenticated %}
+                    {% if request.user != trip.uploader %}
+                        <form class="ml-auto" action="{% url 'mainapp:message_button' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ trip.uploader.id }}">
+                            <input class="message-btn ml-auto" type="submit" name="message" value="Message Uploader">
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <p class="card-text"><strong>Start Date:</strong> {{ trip.start_date }}</p>
+            <p class="card-text"><strong>End Date:</strong> {{ trip.end_date }}</p>
+            <p class="card-text"><strong>Description:</strong> {{ trip.description }}</p>
+            <p class="card-text"><strong>Location:</strong> {{ trip.place.name }}, {{ trip.place.address }}</p>
+            <p class="card-text"><strong>Meeting Point:</strong> {{ trip.meeting_point }}</p>
+            <p class="card-text"><strong>Cost Per Person:</strong> ${{ trip.cost_per_person }}</p>
+            <p class="card-text"><strong>Max Capacity:</strong> {{ trip.max_capacity }}</p>
+            <p class="card-text"><strong>Participants:</strong></p>
+            <ul style="list-style-type: none; padding-left: 0;">
+    {% for participant in trip.participants.all %}
+    <li>
+        <div class="user-info">
+            <img src="{% if participant.userprofile.profile_photo %}{{ participant.userprofile.profile_photo.url }}{% else %}{% static 'mainapp/user.png' %}{% endif %}" alt="{{ participant.username }}">
+            <span>{{ participant.username }}</span>
+            {% if request.user.is_authenticated %}
+                {% if request.user != participant %}
+                    <form class="ml-auto" action="{% url 'mainapp:message_button' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ participant.id }}">
+                        <input type="hidden" name="redirect_url" value="{{ request.path }}">
+                        <input class="message-btn ml-auto" type="submit" name="message" value="Message">
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+        </div>
+    </div>
+
+<div class="card">
+    <div class="card-header">
+        Photos
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for photo in trip.trip_photos.all %}
+            <div class="col-md-4 mb-3">
+                <a href="{{ photo.photo.url }}" target="_blank">
+                    <img src="{{ photo.photo.url }}" alt="Trip Photo" class="img-fluid">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+    <div class="card">
+        <div class="card-header">
+            Trip Preferences
+        </div>
+        <div class="card-body">
+            <ul>
+                {% for preference in trip.preferences.preferences.all %}
+                <li>{{ preference.value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+<div class="card">
+    <div class="card-header">
+        Average Rating and Reviews of {{ trip.place.name }}
+    </div>
+    <div class="card-body">
+        <p><strong>Average Rating:</strong> {{ trip.average_rating }}</p>
+        <p><strong>Reviews:</strong></p>
+        <ul>
+            {% for review in trip.reviews|slice:":3" %}
+                <li>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <p>{{ review.review }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="user-info text-right">
+                                <span>by: {{ review.user.username }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+   {% if request.user.is_authenticated %}
+    {% if request.user == trip.uploader %}
+        <div class="card">
+            <div class="card-header">
+                Join Requests
+            </div>
+            <div class="card-body">
+                {% for join_request in trip.join_requests.all %}
+                    <div class="join-request">
+                        <div class="user-info">
+                            <img src="{% if join_request.user.userprofile.profile_photo %}{{ join_request.user.userprofile.profile_photo.url }}{% else %}{% static  'mainapp/user.png' %}{% endif %}" alt="{{ join_request.user.username }}">
+                            <span>{{ join_request.user.username }}</span>
+                            <div class="ml-auto">
+                                <form action="{% url 'mainapp:accept_join_request' trip.id join_request.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm mr-2">Accept</button>
+                                </form>
+                                <form action="{% url 'mainapp:decline_join_request' trip.id join_request.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                </form>
+                            </div>
+                        </div>
+                        <p><strong>Status:</strong> {{ join_request.status }}</p>
+                        <p><strong>Timestamp:</strong> {{ join_request.timestamp }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                {% if not request.user in trip.participants.all %}
+                    {% if trip.join_requests.all %}
+                        {% with join_request_pending=trip.join_requests.all %}
+                            {% for join_request in join_request_pending %}
+                                {% if join_request.user == request.user %}
+                                    <div class="join-status">
+                                        <h2 class="card-title">Join Status</h2>
+                                        <p><strong>Status:</strong> Pending</p>
+                                    </div>
+                                    {% else %}
+                                    <div class="join-request">
+                                    <form action="{% url 'mainapp:join_trip' trip.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary btn-lg join-request-btn">Join Trip</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                                        {% if not join_request_pending %}
+                                <div class="join-request">
+                                    <form action="{% url 'mainapp:join_trip' trip.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary btn-lg join-request-btn">Join Trip</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        <div class="join-request">
+                            <form action="{% url 'mainapp:join_trip' trip.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-lg join-request-btn">Join Trip</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="join-status">
+                        <h2 class="card-title">Join Status</h2>
+                        <p><strong>Status:</strong> Joined</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+</div>
+ <div class="review-rating">
+     <!-- Display reviews -->
+    <h2>Reviews</h2>
+    {% if trip.reviews.all %}
+        <ul>
+            {% for review in trip.reviews.all %}
+                <li>{{ review.user.username }} - {{ review.text }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+
+    <!-- Display ratings -->
+    <h2>Ratings</h2>
+    {% if trip.ratings.all %}
+        <ul>
+            {% for rating in trip.ratings.all %}
+                <li>{{ rating.user.username }} - {{ rating.value }} Stars</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No ratings yet.</p>
+    {% endif %}
+ </div>   
+<style>
+    /* Custom CSS styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        margin-top: 20px;
+    }
+    .container {
+        max-width: 800px;
+        margin: auto;
+    }
+    .card {
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+        background-color: rgba(26, 71, 42, 0.72);
+        color: white;
+        font-size: 24px;
+        padding: 20px;
+        border-radius: 8px 8px 0 0;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .card-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    .card-text {
+        margin-bottom: 20px;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .user-info img {
+        width: 40px; /* Adjusted image size */
+        height: 40px; /* Adjusted image size */
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover; /* Ensures the image fits perfectly */
+        border: 2px solid #1a472a; /* Improved border color */
+    }
+    .join-request-btn {
+        margin-top: 10px;
+    }
+    .message-btn { /* Improved button style for message button */
+        background-color: rgba(26, 71, 42, 0.5500000119);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        margin-right: 5px;
+        transition: all 0.3s ease;
+    }
+    .message-btn:hover {
+        background-color: #144123;
+    }
+    .lock-icon {
+        width: 20px; /* Adjusted lock icon size */
+        height: 20px; /* Adjusted lock icon size */
+        margin-right: 5px;
+        fill: #1a472a; /* Improved lock icon color */
+    }
+    .img-fluid {
+        max-width: 100%; /* Ensures images don't overflow their containers */
+        height: auto; /* Maintains aspect ratio */
+        border-radius: 8px; /* Adds rounded corners to images */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow effect */
+    }
+</style>
+{% endblock %}
+
+

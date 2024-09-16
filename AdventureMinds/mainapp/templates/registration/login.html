@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #EEECDC; /* Fallback color */
+            background-image: url("{% static 'mainapp/flatten-1.png' %}");
+            background-size: cover;
+            background-position: center;
+            color: #084B29;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .overlay {
+            background-color: rgba(238, 236, 220, 0.8); /* Overlay color with opacity */
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1; /* Ensure the overlay is above the background image */
+        }
+        .container {
+            background-color: white;
+            {#backdrop-color: #c3eddf;#}
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 350px;
+            {#height: 90%;#}
+            {#max-height: 550px;#}
+            text-align: center;
+            z-index: 2; /* Ensure the container is above the overlay */
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #084B29;
+        }
+        form {
+            margin-top: 20px;
+            text-align: left; /* Align form elements to the left */
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #084B29;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #084B29;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #063b20;
+        }
+        a {
+            display: block;
+            margin-top: 10px;
+            color: #084B29;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            text-align: center;
+        }
+        a:hover {
+            color: #063b20;
+        }
+        .error-message {
+            color: #2540ef;
+            margin-top: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+{#    <div class="overlay">#}
+        <div class="container">
+{#            <img src="path/to/your/logo.png" alt="Logo" class="logo">#}
+            <img src="{% static 'mainapp/AdventureMindsLogo.png' %}" alt="Logo" class="logo">
+{#            <img src="{% static 'mainapp/logo-AM.png' %}" alt="Logo" class="logo">#}
+            <br/>
+            <h1>Login</h1>
+            <form method="POST">
+                <h5 class="error-message">{{ msg }}</h5>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Login</button>
+                <a href="{% url 'mainapp:signup' %}">Don't have an account? Create one</a>
+                <a href="{% url 'mainapp:forgotpassword' %}">Forgot your password?</a>
+            </form>
+        </div>
+{#    </div>#}
+</body>
+</html>

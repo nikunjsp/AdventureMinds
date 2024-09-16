@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Preferences Form</title>
+<style>
+body {
+  font-family: 'Roboto', sans-serif; /* Updated font family */
+  background-color: #f0ebdf; /* Updated background color */
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff; /* Updated container background color */
+}
+
+.preferences-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.preference-field {
+  margin-bottom: 20px;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #1a472a; /* Updated title color */
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+}
+
+.options label {
+  cursor: pointer;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  transition: background-color 0.3s;
+  color: #1a472a; /* Updated label color */
+}
+
+.options label:hover {
+  background-color: #f0f0f0;
+}
+
+.options input[type="checkbox"] {
+  display: none;
+}
+
+.options input[type="checkbox"]:checked + label {
+  background-color: rgba(26, 71, 42, 0.5500000119);
+  color: #fff;
+}
+
+.submit-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #1a472a; /* Updated button background color */
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: rgba(26, 71, 42, 0.9); /* Updated button hover background color */
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <form method="post" id="preferences-form">
+    {% csrf_token %}
+    <div class="preferences-container">
+{#      <h1 class="title">Add Your Preferences</h1> <!-- Updated title class -->#}
+      {% for field in form %}
+        <div class="preference-field">
+            <div class="title">{{ field.label }}</div>
+            <div class="options" id="{{ field.html_name }}">
+                {% for choice in field.field.queryset %}
+                    <input type="checkbox" id="choice_{{ choice.pk }}" name="{{ field.html_name }}" value="{{ choice.pk }}" {% if choice.value in existing_preferences %}checked{% endif %}>
+                    <label for="choice_{{ choice.pk }}">{{ choice.value }}</label>
+                {% endfor %}
+            </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="submit-button">Submit</button>
+  </form>
+</div>
+
+<script>
+    console.log("Existing Preferences in template:", {{ existing_preferences}});
+</script>
+
+</body>
+</html>

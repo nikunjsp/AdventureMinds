@@ -1,0 +1,65 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}
+    Add Rating and Review for {{ place.name }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Add Rating and Review for {{ place.name }}</h1>
+
+        <div class="rating-review-section">
+            <form action="{% url 'mainapp:add_rating_and_review' place_id=place.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ rating_form.as_p }}
+                </div>
+                <div class="form-group">
+                    {{ review_form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Rating and Review</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Custom CSS styles */
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .rating-review-section {
+            margin-bottom: 30px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}

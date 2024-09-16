@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdventureMinds - Preview Trips</title>
+    <link rel="stylesheet" href="{% static 'mainapp/homepage.css' %}">
+    <style>
+        /* Additional styles for the trip list */
+        .trip-list {
+            padding-top: 50px;
+            padding-bottom: 50px;
+            background-color: #f8f9fa;
+        }
+
+        .trip-list .container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .trip-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .trip-card img {
+            width: calc(33.33% - 20px); /* Adjust width for three images in a row with margin */
+            height: 200px; /* Fixed height for images */
+            margin: 10px; /* Margin between images */
+            border-radius: 10px; /* Rounded corners for images */
+            object-fit: cover; /* Maintain aspect ratio */
+            display: inline-block; /* Display images in a row */
+            vertical-align: top; /* Align images to the top */
+        }
+
+        .trip-info {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        .trip-info h5 {
+            margin-bottom: 10px;
+        }
+
+        .trip-info p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header>
+        <div class="container">
+            <h1>AdventureMinds</h1>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'mainapp:homepage' %}">Trips</a></li>
+                    <li><a href="{% url 'mainapp:contact_us' %}">Contact</a></li>
+                    <li><a href="{% url 'mainapp:signup' %}">Sign Up</a></li>
+                    <li><a href="{% url 'mainapp:login' %}">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="trip-list" class="trip-list">
+        <div class="container">
+            <h2>Preview Trips</h2>
+            <div class="row">
+                {% for trip in trips %}
+                    <div class="col-12 col-md-6 col-lg-4 mb-4">
+                        <div class="trip-card">
+                            <div class="image-container">
+                                {% for photo in trip.trip_photos.all|slice:":2" %}
+                                    <img src="{{ photo.photo.url }}" alt="Trip Photo">
+                                {% endfor %}
+                            </div>
+                            <div class="trip-info">
+                                <a href="{% url 'mainapp:login' %}" style="color: black;">
+                                    <h5>{{ trip.title }}</h5>
+                                    <p><strong>Place:</strong> {{ trip.place }}</p>
+                                    <p><strong>Budget:</strong> ${{ trip.cost_per_person }}</p>
+                                    <p><strong>Date:</strong> {{ trip.start_date|date:"Y-m-d" }}</p>
+                                    <p><strong>Members Joined:</strong> {{ trip.participants.count }}</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Contact Information</h3>
+                    <p>Email: contact@adventureminds.com</p>
+                    <p>Phone: +1 (123) 456-7890</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Follow Us</h3>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p>&copy; 2024 AdventureMinds. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

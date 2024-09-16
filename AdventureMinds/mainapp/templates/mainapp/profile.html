@@ -1,0 +1,169 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        {#background-color: #fff; /* Updated background color */#}
+        margin: 0;
+        padding: 0;
+    }
+
+    .profile-container {
+        max-width: 650px;
+        margin: 20px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-picture {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .profile-picture img {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #eee;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .profile-picture img:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-update,
+    .btn-preferences,
+    .btn-save {
+        width: 150px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        background-color: #327D81; /* Updated button color */
+        border-color: #327D81; /* Updated button border color */
+        color: #000000;
+    }
+
+    .btn-delete {
+        width: 150px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
+
+    .btn {
+        background-color: rgba(26, 71, 42, 0.5500000119);
+        border-color: rgba(26, 71, 42, 0.5500000119);
+        color: #fff;
+    }
+
+    .btn:hover {
+        background-color: rgba(26, 71, 42, 0.5500000119);
+        border-color: rgba(26, 71, 42, 0.5500000119);
+    }
+
+    label {
+        font-weight: bold;
+        color: rgba(26, 71, 42, 0.5500000119); /* Updated label color */
+    }
+
+    .form-group {
+        text-align: left;
+        margin-bottom: 15px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"] {
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    /* Placeholder style for uploaded photo */
+    .placeholder-name {
+        font-weight: bold;
+        color: rgba(26, 71, 42, 0.5500000119); /* Updated placeholder color */
+        margin-top: 10px;
+    }
+</style>
+<div class="container">
+    <div class="profile-container">
+        <div class="profile-picture mx-auto">
+            {% if form.instance.profile_photo %}
+                <img id="profile-image" src="{{ form.instance.profile_photo.url }}" alt="Profile Photo">
+            {% else %}
+                <img id="profile-image" src="{% static 'mainapp/user.png' %}" alt="Default Profile Photo">
+            {% endif %}
+        </div>
+        <div>
+            <button class="btn btn-update" onclick="updatePhoto()">Update Photo</button>
+            <p id="uploaded-name" class="placeholder-name" style="display: none;"></p>
+        </div>
+        <form id="profile-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="id_profile_photo" name="profile_photo" accept="image/*" style="display: none;">
+            <div class="form-group">
+                <label for="id_username">Username:</label>
+                {{ form.username }}
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email:</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="id_first_name">First Name:</label>
+                {{ form.first_name }}
+            </div>
+            <div class="form-group">
+                <label for="id_last_name">Last Name:</label>
+                {{ form.last_name }}
+            </div>
+            <div class="form-group">
+                <label for="id_date_of_birth">Date of Birth:</label>
+                {{ form.date_of_birth }}
+            </div>
+            <div class="form-group">
+                <label for="id_address">Address:</label>
+                {{ form.address }}
+            </div>
+            <div class="form-group">
+                <label for="id_phone_number">Phone Number:</label>
+                {{ form.phone_number }}
+            </div>
+            <a href="{% url 'mainapp:user_preferences' %}" class="btn btn-preferences">Edit Preferences</a>
+            <button type="submit" class="btn btn-save">Save</button>
+        </form>
+    </div>
+</div>
+    <script>
+    function updatePhoto() {
+        document.getElementById('id_profile_photo').click();
+    }
+
+    // Display uploaded name when photo is selected
+    document.getElementById('id_profile_photo').addEventListener('change', function(event) {
+        var uploadedName = document.getElementById('uploaded-name');
+        uploadedName.textContent = event.target.files[0].name;
+        uploadedName.style.display = 'block';
+    });
+
+    // Trigger file input click event when update photo button is clicked
+    document.querySelector('.btn-update').addEventListener('click', function() {
+        updatePhoto();
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,18 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}Blogs{% endblock %}
+{% block content %}
+
+    <h1>{{ blog_post.title }}</h1>
+    <br><br>
+    <p><strong>Author:</strong> {{ blog_post.author.username }}</p>
+    <p><strong>Place:</strong> {{ blog_post.place.name }}</p>
+    <p><strong>Created at:</strong> {{ blog_post.created_at }}</p>
+    <br>
+    <p><strong>Content:</strong> {{ blog_post.content }}</p>
+    <br>
+    <img src="{{ blog_post.image.url }}">
+
+
+{% endblock %}

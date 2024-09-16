@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        li a:hover {
+            color: #007bff;
+        }
+        .uploader {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .sorting-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .sorting-buttons a {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .sorting-buttons a:hover {
+            background-color: #0056b3;
+        }
+        #search-suggestions {
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            position: absolute;
+            width: 70%;
+            z-index: 1;
+            display: none;
+        }
+        #search-suggestions ul {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+        }
+        .search-query {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .search-query:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Explore Trips</h1>
+
+        <form id="search-form" method="GET" action="{% url 'mainapp:trip_list' %}">
+            <input type="text" id="search-input" name="query" placeholder="Search trips..." value="{{ query }}">
+            <button type="submit">Search</button>
+            <div id="search-suggestions">
+                {% if saved_searches %}
+                    <ul>
+                        {% for search_query in saved_searches %}
+                            <li class="search-query">{{ search_query }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </form>
+
+        <div class="sorting-buttons">
+            {% if user.is_authenticated %}
+                <a href="?sort_by=recommendation">Recommended</a>
+                <a href="?sort_by=alphabetical">A-Z</a>
+            {% endif %}
+        </div>
+
+        <ul class="trip-list">
+            {% for trip in trips %}
+                <li>
+                    <a href="{% url 'mainapp:trip_detail' trip.id %}">{{ trip.place.name }}</a>
+                    <div class="uploader">by {{ trip.uploader.username }}</div>
+                </li>
+            {% empty %}
+                <li>No trips found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+<script>
+        // JavaScript code to handle search suggestions
+        const searchInput = document.getElementById('search-input');
+        const searchSuggestions = document.getElementById('search-suggestions');
+        const searchQueries = document.querySelectorAll('.search-query');
+
+        // Hide search suggestions initially
+        searchSuggestions.style.display = 'none';
+
+        // Show search suggestions when user clicks on the search input
+        searchInput.addEventListener('click', function() {
+            searchSuggestions.style.display = 'block';
+        });
+
+        // Insert selected search query into the search input field
+        searchQueries.forEach(function(query) {
+            query.addEventListener('click', function() {
+                searchInput.value = query.textContent;
+                searchSuggestions.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

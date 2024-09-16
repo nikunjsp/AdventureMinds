@@ -1,0 +1,56 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}
+    Travel Trips
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 style="text-align: center;">Add Trip</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_title"><strong>Trip Name:</strong></label>
+                {{ trip_form.title }}
+            </div>
+            <div class="form-group">
+                <label for="id_place"><strong>Place:</strong></label>
+                {{ trip_form.place }}
+            </div>
+            <div class="form-group">
+                <label for="id_start_date"><strong>Start Date:</strong></label>
+                {{ trip_form.start_date }}
+            </div>
+            <div class="form-group">
+                <label for="id_end_date"><strong>End Date:</strong></label>
+                {{ trip_form.end_date }}
+            </div>
+            <div class="form-group">
+                <label for="id_description"><strong>Description:</strong></label>
+                {{ trip_form.description }}
+            </div>
+            <div class="form-group">
+                <label for="id_meeting_point"><strong>Meeting Point:</strong></label>
+                {{ trip_form.meeting_point }}
+            </div>
+            <div class="form-group">
+                <label for="id_max_capacity"><strong>Maximum Capacity:</strong></label>
+                {{ trip_form.max_capacity }}
+            </div>
+            <div class="form-group">
+                <label for="id_cost_per_person"><strong>Cost Per Person:</strong></label>
+                {{ trip_form.cost_per_person }}
+            </div>
+            <div class="form-group">
+                <label for="id_photos"><strong>Photos:</strong></label>
+                {{ trip_form.photos }}
+            </div>
+            <div class="form-group">
+                <label for="id_preferences"><strong>Preferences:</strong></label>
+                {{ preference_form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,8 @@
+{% extends 'mainapp/base_calender.html' %}
+{% load static %}
+{% block content_calender %}
+    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/calender.css' %}">
+    <div class="calendar-container">
+        {{ calendar }}
+    </div>
+{% endblock %}

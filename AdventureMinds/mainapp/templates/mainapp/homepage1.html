@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdventureMinds - Your Ultimate Travel Buddy</title>
+    <link rel="stylesheet" href="{% static 'mainapp/homepage.css' %}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>AdventureMinds</h1>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'mainapp:homepage' %}">Trips</a></li>
+                    <li><a href="{% url 'mainapp:contact_us' %}">Contact</a></li>
+                    <li><a href="{% url 'mainapp:signup' %}">Sign Up</a></li>
+                    <li><a href="{% url 'mainapp:login' %}">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <img src="{% static 'mainapp/login.png' %}" alt="AdventureMinds" class="hero-image">
+                <div class="hero-text">
+                    <h2>Your Ultimate Travel Buddy</h2>
+                    <p>Connect with fellow adventurers, discover exciting destinations, and embark on unforgettable journeys together!</p>
+                    <a href="{% url 'mainapp:signup' %}" class="btn">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About AdventureMinds</h2>
+                    <p>AdventureMinds is your go-to platform for connecting with like-minded travelers who share your passion for exploration and adventure. Whether you're seeking adrenaline-pumping activities, cultural experiences, or simply looking for companions to explore new destinations, AdventureMinds has you covered.</p>
+                    <p>Our mission is to make travel more accessible, enjoyable, and enriching by fostering meaningful connections between travelers from all walks of life.</p>
+                </div>
+                <img src="{% static 'mainapp/login.png' %}" alt="About AdventureMinds" class="about-image">
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="service">
+                <img src="{% static 'mainapp/login.png' %}" alt="Service 1" class="service-image">
+                <div class="service-text">
+                    <h3>Custom Trip Planning</h3>
+                    <p>We provide personalized trip planning services tailored to your preferences and interests, ensuring every journey is unique and unforgettable.</p>
+                </div>
+            </div>
+            <div class="service">
+                <img src="{% static 'mainapp/login.png' %}" alt="Service 2" class="service-image">
+                <div class="service-text">
+                    <h3>Group Travel Opportunities</h3>
+                    <p>Join group tours led by experienced guides, and explore iconic landmarks and hidden gems with a fun and sociable group of fellow travelers.</p>
+                </div>
+            </div>
+            <div class="service">
+                <img src="{% static 'mainapp/login.png' %}" alt="Service 3" class="service-image">
+                <div class="service-text">
+                    <h3>Local Experiences</h3>
+                    <p>Immerse yourself in the local culture and traditions by participating in authentic experiences curated by our knowledgeable locals.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <p>Have questions or need assistance? Feel free to reach out to us!</p>
+            <form action="#" class="contact-form">
+                <input type="text" placeholder="Your Name">
+                <input type="email" placeholder="Your Email">
+                <textarea placeholder="Your Message"></textarea>
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Contact Information</h3>
+                    <p>Email: contact@adventureminds.com</p>
+                    <p>Phone: +1 (123) 456-7890</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Follow Us</h3>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p>&copy; 2024 AdventureMinds. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

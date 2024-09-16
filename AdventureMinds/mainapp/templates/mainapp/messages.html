@@ -1,0 +1,246 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}Chat{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'mainapp/messages.css' %}">
+
+    <style>
+    .container-fluid {
+            max-width: 100%;
+            width: 100%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #e9ecef;
+        }
+    </style>
+
+{% if user.is_authenticated %}
+    <input type="hidden" id="logged-in-user" value="{{ user.id }}">
+{% endif %}
+<div class="container-fluid h-100 " style="margin-right: 0 !important; margin-left: 0 !important;">
+    <div class="row justify-content-center h-100 ">
+        <div class="col-md-4 col-xl-3 chat h-100 mt-4" style="height: 600px !important;">
+            <div class="card mb-sm-3 mb-md-0 contacts_card" >
+                <div class="card-header">
+                    <div class="input-group">
+                        <button class="create-group-btn" onclick="openPopup()">Create Group</button>
+                    </div>
+                </div>
+                <div class="card-header">
+                    <div class="input-group">
+                        <input type="text" placeholder="Search..." id="searchbar" class="form-control search">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body contacts_body" >
+                    <ui class="contacts" id="contacts">
+                        {% for userchat in userchats %}
+                            <li class="{% if forloop.first or userchat.id == last_active_userchat_id %}active{% endif %} contact-li" chat-id="chat_{{ userchat.id }}" data-userchat-id="{{ userchat.id }}" style="cursor: pointer">
+                                <div class="d-flex bd-highlight">
+                                    <div class="img_cont">
+                                        {% if userchat.group %}
+                                            <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                        {% else %}
+                                            {% if userchat.first_person.user == user %}
+                                                {% if userchat.second_person.profile_photo %}
+                                                    <img src="{{ userchat.second_person.profile_photo.url }}" class="rounded-circle user_img">
+                                                {% else %}
+                                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                                {% endif %}
+                                            {% else %}
+                                                {% if userchat.first_person.profile_photo %}
+                                                    <img src="{{ userchat.first_person.profile_photo.url }}" class="rounded-circle user_img">
+                                                {% else %}
+                                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if userchat.chatmessage_userchat.all and tread.chatmessage_userchat.all.last.user != user and not userchat.chatmessage_userchat.all.last.read %}
+                                            <span class="new_message_icon"></span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="user_info">
+                                        {% if userchat.group %}
+                                            <span>{{ userchat.group.name }}</span>
+                                        {% else %}
+                                            {% if userchat.first_person.user == user %}
+                                                <span>{{ userchat.second_person.user.username }}</span>
+                                            {% else %}
+                                                <span>{{ userchat.first_person.user.username }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ui>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+        <div class="col-md-8 col-xl-6 chat h-100 mt-4" style="height: 600px !important;">
+            <div class="card">
+                {% for userchat in userchats %}
+                    <div class="messages-wrapper  {% if forloop.first %}hide is_active{% else %}hide{% endif %}" chat-id="chat_{{ userchat.id }}" other-user-id="
+                                {% if userchat.first_person.user == user %}
+                                    {% if not userchat.group %}
+                                        {{ userchat.second_person.user.id }}
+                                    {% else %}
+                                        {{ userchat.group.id }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ userchat.first_person.user.id }}
+                                {% endif %}
+                            ">
+                        <div class="card-header msg_head">
+                            <div class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                    {% if userchat.group %}
+                                        <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                    {% else %}
+                                        {% if userchat.first_person.user == user %}
+                                            {% if userchat.second_person.profile_photo %}
+                                                <img src="{{ userchat.second_person.profile_photo.url }}" class="rounded-circle user_img">
+                                            {% else %}
+                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                            {% endif %}
+                                        {% else %}
+                                            {% if userchat.first_person.profile_photo %}
+                                                <img src="{{ userchat.first_person.profile_photo.url }}" class="rounded-circle user_img">
+                                            {% else %}
+                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="user_info">
+                                    {% if userchat.group %}
+                                        <span>{{ userchat.group.name }}</span>
+                                    {% else %}
+                                        {% if userchat.first_person.user == user %}
+                                            <span>{{ userchat.second_person.user.username }}</span>
+                                        {% else %}
+                                            <span>{{ userchat.first_person.user.username }}</span>
+                                        {% endif %}
+                                    {% endif %}
+                                    <p>{{ userchat.chatmessage_userchat.all.count }} messages</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body msg_card_body">
+                            {% for chat in userchat.chatmessage_userchat.all %}
+                                {% if chat.user.user == user %}
+                                    <div class="d-flex mb-4 replied">
+                                        <div class="msg_cotainer_send">
+                                            {{ chat.message }}
+                                            <span class="msg_time_send">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
+                                        </div>
+                                        <div class="img_cont_msg">
+                                            {% if chat.user.profile_photo %}
+                                                <img src="{{chat.user.profile_photo.url }}" class="rounded-circle user_img_msg">
+                                            {% else %}
+                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="d-flex mb-4 received">
+                                        <div class="img_cont_msg">
+                                            {% if chat.user.profile_photo %}
+                                                <img src="{{chat.user.profile_photo.url }}" class="rounded-circle user_img_msg">
+                                            {% else %}
+                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
+                                            {% endif %}
+                                        </div>
+                                        <div class="msg_cotainer">
+                                            {{ chat.message }}
+                                            <span class="msg_time">{{ chat.user.user.username }}, {{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                {% endfor %}
+                <div class="card-footer">
+                    <form id="send-message-form">
+                        <div class="input-group">
+                            <div class="input-group-append">
+                                <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+                            </div>
+                            <input type="text" name="" id="input-message" class="form-control type_msg" placeholder="Type your message...">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="submit">
+                                    <span class="input-group-text send_btn">
+                                        <i class="fas fa-location-arrow"></i>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="{% static 'mainapp/messages.js' %}"></script>
+
+    <script>
+        function openPopup() {
+            var screenWidth = window.screen.width;
+            var screenHeight = window.screen.height;
+            var popupWidth = 400;
+            var popupHeight = 300;
+            var left = (screenWidth - popupWidth) / 2;
+            var top = (screenHeight - popupHeight) / 2;
+
+            // Open the popup window at the center position
+            var popup = window.open('{% url "mainapp:create_group" %}', 'popup', 'width=400,height=300,left=' + left + ',top=' + top);
+            popup.focus();
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+            {% for message in messages %}
+                window.opener.location.reload();
+                window.close();
+            {% endfor %}
+        {% endif %}
+    });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            $('.contact-li').on('click', function() {
+                var userchat_id = $(this).data('userchat-id'); // Assuming you have a data attribute for the user ID
+                $.ajax({
+                    url: '/set_last_active_userchat_id/',
+                    type: 'POST',
+                    data: {
+                        'userchat_id': userchat_id,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}
+    Travel Trips
+{% endblock %}
+
+{% block content %}
+<style>
+
+
+    .custom-container-fluid {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .card {
+        width: 100%;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        height: 400px; /* Increase card height */
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Updated button styles */
+    .btn-secondary {
+        background-color: rgba(26, 71, 42, 0.5500000119);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        margin-right: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background-color: #495057;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    /* Wishlist button */
+    .wish-list-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .wish-list-btn button {
+        background-color: transparent;
+        border: none;
+        color: #333;
+        font-size: 24px;
+        transition: color 0.3s ease;
+    }
+
+    .wish-list-btn button.clicked {
+        color: red; /* Change color when clicked */
+    }
+</style>
+
+<div class="container  custom-container-fluid">
+    <div class="row sort-buttons">
+        <div class="col">
+            <button class="btn btn-secondary" onclick="window.location.href='{% url 'mainapp:trip_list' %}?sort_by=recommendation'">Sort by Recommendation</button>
+            <button class="btn btn-secondary" onclick="window.location.href='{% url 'mainapp:trip_list' %}?sort_by=alphabetical'">Sort Alphabetically</button>
+            <button class="btn btn-secondary" onclick="window.location.href='{% url 'mainapp:trip_list' %}?my_trips'">Uploaded by me</button>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        {% for trip in trips %}
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                <a href="{% url 'mainapp:trip_detail' trip.id %}" class="card-link">
+                    <div class="card">
+                        <div class="wish-list-btn">
+                            <button class="wishlist-toggle" data-trip-id="{{ trip.id }}"><i class="fas fa-heart"></i></button>
+                        </div>
+                        <div id="carouselExampleIndicators{{ forloop.counter }}" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators">
+                                {% for photo in trip.trip_photos.all %}
+                                    <li data-target="#carouselExampleIndicators{{ forloop.parentloop.counter }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+                                {% endfor %}
+                            </ol>
+                            <div class="carousel-inner">
+                                {% for photo in trip.trip_photos.all %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <img src="{{ photo.photo.url }}" class="d-block w-100" alt="Trip Photo">
+                                    </div>
+                                {% empty %}
+                                    <div class="carousel-item active">
+                                        <img src="https://via.placeholder.com/160x90" class="d-block w-100" alt="No Photo Available">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <a class="carousel-control-prev" href="#carouselExampleIndicators{{ forloop.counter }}" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#carouselExampleIndicators{{ forloop.counter }}" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <a href="{% url 'mainapp:trip_detail' trip.id %}" class="card-link" style="color: black">
+                            <h5 class="card-title">{{ trip.title }}</h5>
+                            <p class="card-text">Place: {{ trip.place }}</p>
+                            <p class="card-text">Budget: ${{ trip.cost_per_person }}</p>
+                            <p class="card-text">Date: {{ trip.start_date|date:"Y-m-d" }}</p>
+                            <p class="card-text">Members Joined: {{ trip.participants.count }}</p>
+                            </a>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% if forloop.counter|divisibleby:3 and not forloop.last %}
+                </div>
+                <div class="row mt-4">
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if trips.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ trips.previous_page_number }}">Previous</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+            {% for num in trips.paginator.page_range %}
+                {% if trips.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > trips.number|add:'-3' and num < trips.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if trips.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ trips.next_page_number }}">Next</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<script>
+    document.querySelectorAll('.wishlist-toggle').forEach(button => {
+        button.addEventListener('click', toggleWishlist);
+    });
+
+    function toggleWishlist(event) {
+        event.preventDefault();
+        const tripId = event.target.dataset.tripId;
+        const wishlistButton = event.target;
+        fetch(`/toggle_wishlist/${tripId}/`)
+        .then(response => {
+            if (response.ok) {
+                wishlistButton.classList                .toggle('clicked');
+            } else {
+                console.error('Failed to toggle wishlist');
+            }
+        })
+        .catch(error => console.error('Error toggling wishlist:', error));
+    }
+</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('.wish-list-btn').click(function(e){
+                e.preventDefault();
+                var tripId = $(this).data('trip-id');
+
+                // Send AJAX request to add or remove from wishlist
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'mainapp:add_or_remove_wishlist' %}",
+                    data: {
+                        'trip_id': tripId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        // Update wishlist items list on success
+                        $('#wishlist-items').html(response.wishlist_items_html);
+                    },
+                    error: function(xhr, errmsg, err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

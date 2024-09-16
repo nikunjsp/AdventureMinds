@@ -1,0 +1,83 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}
+    Your Trips
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'mainapp/user_trip_list.css' %}">
+
+<div class="container">
+    <div class="trip-section">
+        <h2>Upcoming Trips</h2>
+        <div class="trip-list future-trips">
+            {% for trip in upcoming_trips %}
+            <a href="{% url 'mainapp:trip_detail' trip_id=trip.id %}" class="trip-tile">
+                <div class="trip-info">
+                    <h3>{{ trip.title }}</h3>
+                    <p><strong>Dates:</strong> {{ trip.start_date }} to {{ trip.end_date }}</p>
+                    <p><strong>Location:</strong> {{ trip.place.name }}, {{ trip.place.address }}</p>
+                    <p><strong>Participants:</strong> {{ trip.participants.count }}</p>
+                </div>
+            </a>
+            {% empty %}
+            <p>No upcoming trips</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="trip-section">
+        <h2>Current Trips</h2>
+        <div class="trip-list current-trips">
+            {% for trip in current_trips %}
+            <a href="{% url 'mainapp:trip_detail' trip_id=trip.id %}" class="trip-tile">
+                <div class="trip-info">
+                    <h3>{{ trip.title }}</h3>
+                        <p><strong>Dates:</strong> {{ trip.start_date }} to {{ trip.end_date }}</p>
+                        <p><strong>Location:</strong> {{ trip.place.name }}, {{ trip.place.address }}</p>
+                        <p><strong>Participants:</strong> {{ trip.participants.count }}</p>
+                </div>
+            </a>
+                {% empty %}
+                <p>No current trips</p>
+                {% endfor %}
+        </div>
+    </div>
+
+    <div class="trip-section">
+        <h2>Past Trips</h2>
+        <div class="trip-list past-trips">
+            {% for trip in past_trips %}
+    {#            <a href="{% url 'mainapp:trip_detail' trip_id=trip.id %}" class="trip-tile">#}
+            <div class="trip-tile">
+
+                <div class="trip-info">
+                    <h3>{{ trip.title }}</h3>
+                    <p><strong>Dates:</strong> {{ trip.start_date }} to {{ trip.end_date }}</p>
+                    <p><strong>Location:</strong> {{ trip.place.name }}, {{ trip.place.address }}</p>
+                    <p><strong>Participants:</strong> {{ trip.participants.count }}</p>
+                </div>
+
+            <div class="action-buttons">
+                <a href="{% url 'mainapp:add_rating_and_review' place_id=trip.place.id %}">
+                    <button class="add-review-button">Add Review</button>
+                </a>
+            </div>
+
+{#            <div class="action-buttons">#}
+{#                <a  href="{% url 'mainapp:trip_detail' trip_id=trip.id %}">#}
+{#                    <button class="add-review-button">Visit Trip</button>#}
+{#                </a>#}
+{#            </div>#}
+            </div>
+{#            </a>#}
+            {% empty %}
+                <p>No past trips</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}

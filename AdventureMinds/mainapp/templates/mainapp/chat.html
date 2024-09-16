@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<body>
+    <h1>Chat with {{ userchat.second_person.username }}</h1>
+    <div id="messages">
+        {% for message in messages %}
+            <p>{{ message.sender.username }}: {{ message.message }}</p>
+        {% endfor %}
+    </div>
+    <form method="post" action="{% url 'send_message' userchat_id=userchat.id %}">
+        {% csrf_token %}
+        <textarea name="message" rows="3" cols="50"></textarea><br>
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>

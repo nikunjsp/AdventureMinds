@@ -1,0 +1,32 @@
+{% extends 'mainapp/homepage.html' %}
+
+{% block body_block %}
+
+    {% if wishlist_items %}
+        <div class="container">
+            <h2 class="mt-5 mb-3 text-center">
+                My Wishlists
+                    <i class="bi bi-heart-fill text-danger"></i>
+            </h2>
+            <div class="">
+                {% for item in wishlist_items %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Variable 1
+                                <form action="{% url 'mainapp:wishlist' %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="wishlist_id" value="{{ item.id }}">
+                                    <button class="btn btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                          </h5>
+                          <p class="card-text"><li>{{ item.trip_id.description }} - {{ item.trip_id.start_date }} to {{ item.trip_id.end_date }}</li>
+                          </p>
+                        </div>
+                      </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
